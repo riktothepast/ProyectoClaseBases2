@@ -1,7 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The MIT License
+ *
+ * Copyright 2014 Rik.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
 package Manual;
@@ -10,8 +28,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -87,7 +110,7 @@ public class SpreadSheet extends JFrame implements ActionListener{
         menuItem2.addActionListener(this);
         menuItem3.addActionListener(this);
         menuItem4.addActionListener(this);
-        
+        fileItem.addActionListener(this);
         JScrollPane scrollPane = new JScrollPane(sheet);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
     }
@@ -130,6 +153,16 @@ public class SpreadSheet extends JFrame implements ActionListener{
         table.getColumnModel().getColumn(col_index).setHeaderValue(col_name);
     }
     
+    void saveFile(String p, String n){
+        try {
+               new ExportToFile().exportToFile(p,n,sheet);
+           } catch (FileNotFoundException ex) {
+               Logger.getLogger(SpreadSheet.class.getName()).log(Level.SEVERE, null, ex);
+           } catch (IOException ex) {
+               Logger.getLogger(SpreadSheet.class.getName()).log(Level.SEVERE, null, ex);
+           }
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
        if(e.getSource().equals(menuItem)){
@@ -144,5 +177,21 @@ public class SpreadSheet extends JFrame implements ActionListener{
        if(e.getSource().equals(menuItem4)){
            change_column_name();
        } 
+       if(e.getSource().equals(fileItem)){
+          String path;
+          JFileChooser chooser = new JFileChooser();
+          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+          int returnVal = chooser.showOpenDialog(this);
+          if(returnVal == JFileChooser.APPROVE_OPTION) {
+              path = chooser.getSelectedFile().getAbsolutePath();
+              String response = JOptionPane.showInputDialog(null,
+            "Enter file name",
+                "filename.txt",
+             JOptionPane.QUESTION_MESSAGE);
+             saveFile(path, response);
+          }
+           
+       }
     }
+    
 }
