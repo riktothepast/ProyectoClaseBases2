@@ -8,11 +8,15 @@ package Manual;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTable; 
 import javax.swing.table.DefaultTableModel; 
 import javax.swing.JScrollPane; 
@@ -21,8 +25,7 @@ import javax.swing.JScrollPane;
  *
  * @author Rik
  */
-public class SpreadSheet extends JFrame{
-    
+public class SpreadSheet extends JFrame implements ActionListener{
     DefaultTableModel dtm;
     JTable sheet;
     JButton addRow, deleteRow;
@@ -55,11 +58,9 @@ public class SpreadSheet extends JFrame{
     }
     
     void init_sheet(){
-        
         dtm = new DefaultTableModel();
         sheet = new JTable(dtm);
         sheet.setPreferredScrollableViewportSize(new Dimension(600, 400));
-        
         menuBar = new JMenuBar();
         //file operations?
         file = new JMenu("File");
@@ -78,11 +79,14 @@ public class SpreadSheet extends JFrame{
         menuBar.add(menu2);
         menuItem3 = new JMenuItem("Add column");
         menu2.add(menuItem3);
-        menuItem4 = new JMenuItem("Delete coulmn(s)");
+        menuItem4 = new JMenuItem("Change Column name");
         menu2.add(menuItem4);
-        
         setJMenuBar(menuBar);
-       
+        // listeners
+        menuItem.addActionListener(this);
+        menuItem2.addActionListener(this);
+        menuItem3.addActionListener(this);
+        menuItem4.addActionListener(this);
         
         JScrollPane scrollPane = new JScrollPane(sheet);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
@@ -98,6 +102,47 @@ public class SpreadSheet extends JFrame{
     }
     
     void add_row(){
-        
+        int index = 0;
+        if( sheet.getSelectedRow()>0)
+            index = sheet.getSelectedRow();
+        else
+            index = 0;
+        dtm.insertRow(index,new Vector());  
+    }
+    
+    void add_column(){
+         String response = JOptionPane.showInputDialog(null,
+            "Column ID?",
+                "enter id",
+             JOptionPane.QUESTION_MESSAGE);
+        dtm.addColumn(response);
+    }
+
+    void change_column_name(){
+        String response = JOptionPane.showInputDialog(null,
+            "new column ID?",
+                "enter id",
+             JOptionPane.QUESTION_MESSAGE);
+      changeName(sheet, sheet.getSelectedColumn(), response);
+    }
+    
+    void changeName(JTable table, int col_index, String col_name){
+        table.getColumnModel().getColumn(col_index).setHeaderValue(col_name);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+       if(e.getSource().equals(menuItem)){
+           add_row();
+       } 
+       if(e.getSource().equals(menuItem2)){
+           delete_selected_rows();
+       } 
+       if(e.getSource().equals(menuItem3)){
+           add_column();
+       } 
+       if(e.getSource().equals(menuItem4)){
+           change_column_name();
+       } 
     }
 }
