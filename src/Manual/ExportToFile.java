@@ -56,7 +56,7 @@ public class ExportToFile {
             StringBuffer Header = new StringBuffer();
             for (int j = 0; j < ColNum; j++) {
                 Header.append(dtm.getColumnName(j));
-                if (j!=ColNum) Header.append("\\t");
+                if (j!=ColNum) Header.append("\t");
             }
             writer.write(Header.toString() + "\r\n");
 
@@ -65,7 +65,7 @@ public class ExportToFile {
                  StringBuffer data = new StringBuffer();
                 for (int j = 0 ; j < ColNum ; j++){
                     data.append(dtm.getValueAt(i,j));
-                    if (j!=ColNum) data.append("\\t");
+                    if (j!=ColNum) data.append("\t");
                 }
                 writer.write(data.toString() + "\r\n");
             }

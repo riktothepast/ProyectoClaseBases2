@@ -218,15 +218,12 @@ public class SpreadSheet extends JFrame implements ActionListener{
        if(e.getSource().equals(fileItem)){
           String path;
           JFileChooser chooser = new JFileChooser();
-          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+          chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
           int returnVal = chooser.showOpenDialog(this);
           if(returnVal == JFileChooser.APPROVE_OPTION) {
-              path = chooser.getSelectedFile().getAbsolutePath();
-              String response = JOptionPane.showInputDialog(null,
-            "Enter file name",
-                "filename.txt",
-             JOptionPane.QUESTION_MESSAGE);
-             saveFile(path, response);
+             path = chooser.getSelectedFile().getParent();
+             System.out.println("Path: "+path+" name: "+chooser.getSelectedFile().getName());
+             saveFile(path, chooser.getSelectedFile().getName());
           }
            
        }
