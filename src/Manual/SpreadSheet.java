@@ -55,7 +55,7 @@ public class SpreadSheet extends JFrame implements ActionListener{
     JMenuBar menuBar;
     JMenu menu, menu2, file;
     JMenuItem menuItem, menuItem2, menuItem3, menuItem4, fileItem, fileItem2;
-    
+    JScrollPane scrollPane;
     //new blank spreadsheet
     public void newSpreadSheet(){
         init_sheet();
@@ -76,8 +76,33 @@ public class SpreadSheet extends JFrame implements ActionListener{
     }
     
     //load from file?
-    public void loadSpreadSheet(String[] headers, String [][] data){
+    public void loadSpreadSheet(ImportFromFile IPF){
+        init_sheet();
+        sheet.setModel(IPF);
+                
+         for(int column = 0; column < sheet.getColumnCount(); column++){ 
+            dtm.addColumn(sheet.getColumnName(column)); 
+          
+            System.out.println(dtm.getColumnName(column));
+        }
+        Object[] data =  new Object[99];
         
+        for(int row = 0; row < sheet.getRowCount(); row++) { 
+            for(int column = 0; column < sheet.getColumnCount(); column++) { 
+               data[column] = sheet.getValueAt(row, column);
+               System.out.println(data[column]);
+            } 
+            dtm.addRow(data); 
+        }
+
+        
+        sheet = new JTable(dtm);
+        getContentPane().remove(scrollPane);
+        scrollPane = new JScrollPane(sheet);
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        setTitle("SpreadSheet Data Creator");
+        pack(); 
+        setVisible(true);
     }
     
     void init_sheet(){
@@ -111,7 +136,7 @@ public class SpreadSheet extends JFrame implements ActionListener{
         menuItem3.addActionListener(this);
         menuItem4.addActionListener(this);
         fileItem.addActionListener(this);
-        JScrollPane scrollPane = new JScrollPane(sheet);
+        scrollPane = new JScrollPane(sheet);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
     }
     

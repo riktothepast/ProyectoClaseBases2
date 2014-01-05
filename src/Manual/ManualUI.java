@@ -24,6 +24,9 @@
 
 package Manual;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author bryan
@@ -100,6 +103,16 @@ public class ManualUI extends javax.swing.JFrame {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
+       //loadSpreadSheet(Vector headers, Vector data)
+        JFileChooser chooser = new JFileChooser();
+          chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+          int returnVal = chooser.showOpenDialog(this);
+          if(returnVal == JFileChooser.APPROVE_OPTION) {
+              ImportFromFile IFP = new ImportFromFile();
+              IFP.importFromFile(chooser.getSelectedFile().getAbsolutePath());
+              new SpreadSheet().loadSpreadSheet(IFP);
+          }
+       
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
