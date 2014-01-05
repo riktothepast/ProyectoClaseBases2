@@ -43,6 +43,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable; 
 import javax.swing.table.DefaultTableModel; 
 import javax.swing.JScrollPane; 
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -54,7 +55,7 @@ public class SpreadSheet extends JFrame implements ActionListener{
     JButton addRow, deleteRow;
     JMenuBar menuBar;
     JMenu menu, menu2, file;
-    JMenuItem menuItem, menuItem2, menuItem3, menuItem4, fileItem, fileItem2;
+    JMenuItem menuItem, menuItem2, menuItem3, menuItem4,menuItem5, fileItem, fileItem2;
     JScrollPane scrollPane;
     //new blank spreadsheet
     public void newSpreadSheet(){
@@ -127,6 +128,8 @@ public class SpreadSheet extends JFrame implements ActionListener{
         menuBar.add(menu2);
         menuItem3 = new JMenuItem("Add column");
         menu2.add(menuItem3);
+        menuItem5 = new JMenuItem("Remove column");
+        menu2.add(menuItem5);
         menuItem4 = new JMenuItem("Change Column name");
         menu2.add(menuItem4);
         setJMenuBar(menuBar);
@@ -134,6 +137,7 @@ public class SpreadSheet extends JFrame implements ActionListener{
         menuItem.addActionListener(this);
         menuItem2.addActionListener(this);
         menuItem3.addActionListener(this);
+        menuItem5.addActionListener(this);
         menuItem4.addActionListener(this);
         fileItem.addActionListener(this);
         scrollPane = new JScrollPane(sheet);
@@ -164,6 +168,11 @@ public class SpreadSheet extends JFrame implements ActionListener{
                 "enter id",
              JOptionPane.QUESTION_MESSAGE);
         dtm.addColumn(response);
+    }
+    
+    void remove_column(){
+        TableColumn tcol = sheet.getColumnModel().getColumn(sheet.getSelectedColumn());
+        sheet.removeColumn(tcol);
     }
 
     void change_column_name(){
@@ -202,6 +211,10 @@ public class SpreadSheet extends JFrame implements ActionListener{
        if(e.getSource().equals(menuItem4)){
            change_column_name();
        } 
+       if(e.getSource().equals(menuItem5)){
+           remove_column();
+       } 
+       
        if(e.getSource().equals(fileItem)){
           String path;
           JFileChooser chooser = new JFileChooser();
