@@ -45,13 +45,13 @@ public class ImportFromFile extends AbstractTableModel  {
             BufferedReader br = new BufferedReader(new InputStreamReader(fin));
             // extract column names
             StringTokenizer st1 =
-                    new StringTokenizer(br.readLine(), "\\t");
+                    new StringTokenizer(br.readLine(), "\t");
             while(st1.hasMoreTokens())
                 ColName.addElement(st1.nextToken());
             // extract dataFile
             while ((aLine = br.readLine()) != null) {
                 StringTokenizer st2 =
-                        new StringTokenizer(aLine, "\\t");
+                        new StringTokenizer(aLine, "\t");
                 while(st2.hasMoreTokens())
                     dataFile.addElement(st2.nextToken());
             }
