@@ -1,29 +1,25 @@
 /*
- * The MIT License
- *
- * Copyright 2014 Rik.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+Copyright [2014] [Rik]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
  */
 
 package Manual;
 
+import Analysis.id3;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -32,7 +28,7 @@ import javax.swing.JOptionPane;
  * @author bryan
  */
 public class ManualUI extends javax.swing.JFrame {
-
+id3 me;
     /**
      * Creates new form ManualUI
      */
@@ -54,10 +50,12 @@ public class ManualUI extends javax.swing.JFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jMenu1.setText("File");
+        jMenu1.setText("Editor");
 
         jMenuItem1.setText("Crear documento.");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -77,7 +75,19 @@ public class ManualUI extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Edit");
+        jMenu2.setText("Analisis");
+
+        jMenuItem3.setText("Analizar Archivo");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem3);
+
+        jMenuItem4.setText("Mostrar Arbol");
+        jMenu2.add(jMenuItem4);
+
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -114,6 +124,41 @@ public class ManualUI extends javax.swing.JFrame {
           }
        
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+            // TODO add your handling code here:
+          String path;
+          JFileChooser chooser = new JFileChooser();
+          chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+          int returnVal = chooser.showOpenDialog(this);
+          if(returnVal == JFileChooser.APPROVE_OPTION) {
+             path = chooser.getSelectedFile().getAbsolutePath();
+             System.out.println("Path: "+path+" name: "+chooser.getSelectedFile().getName());
+             // call here the analisis
+              me = new id3();
+              Scanner in = new Scanner(path);
+
+              String str = in.nextLine();
+
+              String response = JOptionPane.showInputDialog(null,
+              "Atributo Clase?",
+                "enter col name",
+              JOptionPane.QUESTION_MESSAGE);
+              
+              me.atributoClase = Integer.parseInt(response);
+
+              int status;
+              try {
+                  status = me.readData(str);
+                  if (status <= 0) {
+                    return;
+                 }
+              } catch (Exception ex) {
+                  Logger.getLogger(SpreadSheet.class.getName()).log(Level.SEVERE, null, ex);
+              }
+                me.createDecisionTree();
+          }
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -156,5 +201,7 @@ public class ManualUI extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     // End of variables declaration//GEN-END:variables
 }
