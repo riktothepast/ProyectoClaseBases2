@@ -33,7 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
  * @author Tavo
  */
 public class BDUI extends javax.swing.JFrame 
@@ -65,7 +64,8 @@ public class BDUI extends javax.swing.JFrame
         Username = "";
         Password = "";
         connection = null;
-        Vistas.pack();
+        Vistas.pack();//para que la ventana no aparezca pequeña
+        Filtros.pack();//para que la ventana (jframe) no aparezca pequeña
         Lista1 = new DefaultListModel();
         Lista2 = new DefaultListModel();
         listaAtributos1.setModel(Lista1);
@@ -83,7 +83,6 @@ public class BDUI extends javax.swing.JFrame
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
         Vistas = new javax.swing.JFrame();
         jLabel7 = new javax.swing.JLabel();
         comboBoxBasedatos = new javax.swing.JComboBox();
@@ -102,6 +101,8 @@ public class BDUI extends javax.swing.JFrame
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaDatos = new javax.swing.JTable();
         botonAceptar = new javax.swing.JButton();
+        botonAgregarFiltro = new javax.swing.JButton();
+        Filtros = new javax.swing.JFrame();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -115,17 +116,6 @@ public class BDUI extends javax.swing.JFrame
         botonIngresar = new javax.swing.JButton();
         textFieldPassword = new javax.swing.JPasswordField();
         botonCancelar = new javax.swing.JButton();
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
 
         jLabel7.setText("Seleccione Basedatos:");
 
@@ -186,41 +176,47 @@ public class BDUI extends javax.swing.JFrame
             }
         });
 
+        botonAgregarFiltro.setText("Agregar Filtro");
+        botonAgregarFiltro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonAgregarFiltroActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout VistasLayout = new javax.swing.GroupLayout(Vistas.getContentPane());
         Vistas.getContentPane().setLayout(VistasLayout);
         VistasLayout.setHorizontalGroup(
             VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(VistasLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9)
                     .addGroup(VistasLayout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel9)
-                            .addGroup(VistasLayout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(27, 27, 27)
-                                .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(botonAgregarAtributo)
-                                    .addComponent(botonQuitarAtributo))
-                                .addGap(22, 22, 22)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(VistasLayout.createSequentialGroup()
-                                .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel8))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(comboBoxBasedatos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(comboBoxTablas, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(botonMostrarTablas)
-                                    .addComponent(botonMostrarAtributos)))
-                            .addComponent(jLabel10)))
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel8))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(comboBoxBasedatos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(comboBoxTablas, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(botonMostrarTablas)
+                            .addComponent(botonMostrarAtributos)))
+                    .addComponent(jLabel10)
                     .addGroup(VistasLayout.createSequentialGroup()
-                        .addGap(184, 184, 184)
-                        .addComponent(botonAceptar)))
+                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonAceptar)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(27, 27, 27)
+                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonAgregarAtributo)
+                            .addComponent(botonQuitarAtributo))
+                        .addGap(22, 22, 22)
+                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(botonAgregarFiltro))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         VistasLayout.setVerticalGroup(
@@ -249,13 +245,26 @@ public class BDUI extends javax.swing.JFrame
                         .addComponent(botonAgregarAtributo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(botonQuitarAtributo)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
-                .addComponent(botonAceptar)
-                .addGap(5, 5, 5)
+                .addGap(18, 18, 18)
+                .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(botonAceptar)
+                    .addComponent(botonAgregarFiltro))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+        );
+
+        javax.swing.GroupLayout FiltrosLayout = new javax.swing.GroupLayout(Filtros.getContentPane());
+        Filtros.getContentPane().setLayout(FiltrosLayout);
+        FiltrosLayout.setHorizontalGroup(
+            FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        FiltrosLayout.setVerticalGroup(
+            FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -442,6 +451,10 @@ public class BDUI extends javax.swing.JFrame
         }
     }//GEN-LAST:event_botonAceptarActionPerformed
 
+    private void botonAgregarFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAgregarFiltroActionPerformed
+        Filtros.setVisible(true);
+    }//GEN-LAST:event_botonAgregarFiltroActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -478,9 +491,11 @@ public class BDUI extends javax.swing.JFrame
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JFrame Filtros;
     private javax.swing.JFrame Vistas;
     private javax.swing.JButton botonAceptar;
     private javax.swing.JButton botonAgregarAtributo;
+    private javax.swing.JButton botonAgregarFiltro;
     private javax.swing.JButton botonCancelar;
     private javax.swing.JButton botonIngresar;
     private javax.swing.JButton botonMostrarAtributos;
@@ -498,7 +513,6 @@ public class BDUI extends javax.swing.JFrame
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
