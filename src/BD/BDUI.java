@@ -23,6 +23,9 @@
  */
 package BD;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -30,6 +33,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.LinkedList;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -582,16 +586,12 @@ public class BDUI extends javax.swing.JFrame
         //primero verificamos que la lista no este vacia para poder agregar un atributo a la otra lista
         if(!Lista1.isEmpty())
         {
-            int[] listaIndices1 = listaAtributos1.getSelectedIndices();
-            for(int i = 0; i < listaIndices1.length; i++)
-            {
-                //System.out.println("Se va a mover el atributo: " + Lista1.getElementAt(listaIndices1[i]));
-                Lista2.addElement(Lista1.getElementAt(listaIndices1[i]));                                                
-                Lista1.removeElementAt(listaIndices1[i]);                                                                
-                
-                listaAtributos1.updateUI();
-                listaAtributos2.updateUI();
-            }
+            //System.out.println("Se va a mover el atributo: " + Lista1.getElementAt(listaIndices1[i]));
+            Lista2.addElement(Lista1.getElementAt(listaAtributos1.getSelectedIndex()));                                                
+            Lista1.removeElementAt(listaAtributos1.getSelectedIndex());                                                                
+
+            listaAtributos1.updateUI();
+            listaAtributos2.updateUI();
         }
     }//GEN-LAST:event_botonAgregarAtributoActionPerformed
 
@@ -599,14 +599,10 @@ public class BDUI extends javax.swing.JFrame
         //primero validamos que la lista este poblada antes de quitar un atributo
         if(!Lista2.isEmpty())
         {
-            int[] listaIndices2 = listaAtributos2.getSelectedIndices();
-            for(int i = 0; i < listaIndices2.length; i++)
-            {
-                Lista1.addElement(Lista2.getElementAt(listaIndices2[i]));
-                Lista2.removeElementAt(listaIndices2[i]);
-                listaAtributos1.updateUI();
-                listaAtributos2.updateUI();
-            }
+            Lista1.addElement(Lista2.getElementAt(listaAtributos2.getSelectedIndex()));
+            Lista2.removeElementAt(listaAtributos2.getSelectedIndex());
+            listaAtributos1.updateUI();
+            listaAtributos2.updateUI();
         }
     }//GEN-LAST:event_botonQuitarAtributoActionPerformed
 
@@ -706,8 +702,10 @@ public class BDUI extends javax.swing.JFrame
     }//GEN-LAST:event_botonAceptarFiltroActionPerformed
 
     private void botonCrearArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCrearArchivoActionPerformed
-        // TODO add your handling code here:        
-        
+        if(ModeloTabla.getRowCount() > 0)
+        {
+            generarArchivo();
+        }
     }//GEN-LAST:event_botonCrearArchivoActionPerformed
 
     private void botonCancelarVistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelarVistasActionPerformed
@@ -962,5 +960,44 @@ public class BDUI extends javax.swing.JFrame
     
     private void agregarFiltro(String[] filtro){
         ModeloFiltro.addRow(filtro);
+    }
+    
+    private void generarArchivo()
+    {
+        try
+        {
+            //creamos el String que imprimiremos en el archivo
+            int cols = ModeloTabla.getColumnCount();
+            int filas = ModeloTabla.getRowCount();
+            String contenido = "";
+            //recorrido para el nombre de las columnas
+            for(int i = 0; i < cols; i++)
+            {
+                contenido += ModeloTabla.getColumnName(i) + "\t";
+            }
+            contenido += "\n";
+            //recorrido para los datos de la tabla
+            for(int contF = 0; contF < filas; contF++)
+            {
+                for(int contC = 0; contC < cols; contC++)
+                {
+                    contenido += ModeloTabla.getValueAt(contF, contC) + "\t";
+                }
+                contenido += "\n";
+            }
+            
+            JFileChooser jfc = new JFileChooser();
+            int returnVal = jfc.showSaveDialog(Vistas);
+            if(returnVal == JFileChooser.APPROVE_OPTION)
+            {
+                File archivo = jfc.getSelectedFile();
+                
+                FileWriter fw = new FileWriter(archivo.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(contenido);
+                bw.close();
+            }
+        }
+        catch(Exception e){}
     }
 }
