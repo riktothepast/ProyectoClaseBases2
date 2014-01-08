@@ -23,12 +23,17 @@
  */
 package BD;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.util.LinkedList;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -51,6 +56,9 @@ public class BDUI extends javax.swing.JFrame
     DefaultListModel Lista2;//Lista usada para poblar la JList ListaAtributos2
     String TablaActual;//Nombre de la tabla seleccionada
     DefaultTableModel ModeloTabla;//modelo que se le asignara a la tablaDatos
+    DefaultTableModel ModeloFiltro;//modelo que se le asignara a la tablaFiltros
+    LinkedList<Campo> listaCampos = new LinkedList<>();     
+    String consulta;
     
     /**
      * Creates new form BDUI
@@ -72,6 +80,11 @@ public class BDUI extends javax.swing.JFrame
         listaAtributos2.setModel(Lista2);
         TablaActual = "";        
         ModeloTabla = new DefaultTableModel();        
+        ModeloFiltro = new DefaultTableModel();
+        String idColumnas[] = {"Tipo","Campo","Operador","Valor"};
+        ModeloFiltro.setColumnIdentifiers(idColumnas);
+        tablaFiltros.setModel(ModeloFiltro);
+        consulta = "";
     }
 
     /**
@@ -100,9 +113,24 @@ public class BDUI extends javax.swing.JFrame
         jLabel10 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaDatos = new javax.swing.JTable();
-        botonAceptar = new javax.swing.JButton();
-        botonAgregarFiltro = new javax.swing.JButton();
+        botonMostrarTuplas = new javax.swing.JButton();
+        botonVerFiltros = new javax.swing.JButton();
+        botonCrearArchivo = new javax.swing.JButton();
+        botonCancelarVistas = new javax.swing.JButton();
         Filtros = new javax.swing.JFrame();
+        jLabel11 = new javax.swing.JLabel();
+        comboBoxCampos = new javax.swing.JComboBox();
+        jLabel12 = new javax.swing.JLabel();
+        comboBoxOperador = new javax.swing.JComboBox();
+        jLabel13 = new javax.swing.JLabel();
+        textFieldValor = new javax.swing.JTextField();
+        botonAgregarFiltro = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tablaFiltros = new javax.swing.JTable();
+        jLabel14 = new javax.swing.JLabel();
+        botonAceptarFiltro = new javax.swing.JButton();
+        botonCancelarFiltro = new javax.swing.JButton();
+        botonEliminarFiltro = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -126,7 +154,7 @@ public class BDUI extends javax.swing.JFrame
             }
         });
 
-        jLabel8.setText("Tablas:");
+        jLabel8.setText("Seleccione Tabla:");
 
         botonMostrarAtributos.setText("Mostrar Atributos");
         botonMostrarAtributos.addActionListener(new java.awt.event.ActionListener() {
@@ -169,17 +197,31 @@ public class BDUI extends javax.swing.JFrame
         ));
         jScrollPane3.setViewportView(tablaDatos);
 
-        botonAceptar.setText("Aceptar");
-        botonAceptar.addActionListener(new java.awt.event.ActionListener() {
+        botonMostrarTuplas.setText("Mostrar Tuplas");
+        botonMostrarTuplas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonAceptarActionPerformed(evt);
+                botonMostrarTuplasActionPerformed(evt);
             }
         });
 
-        botonAgregarFiltro.setText("Agregar Filtro");
-        botonAgregarFiltro.addActionListener(new java.awt.event.ActionListener() {
+        botonVerFiltros.setText("Agregar Filtro");
+        botonVerFiltros.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonAgregarFiltroActionPerformed(evt);
+                botonVerFiltrosActionPerformed(evt);
+            }
+        });
+
+        botonCrearArchivo.setText("Crear Archivo");
+        botonCrearArchivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonCrearArchivoActionPerformed(evt);
+            }
+        });
+
+        botonCancelarVistas.setText("Cancelar");
+        botonCancelarVistas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonCancelarVistasActionPerformed(evt);
             }
         });
 
@@ -188,36 +230,53 @@ public class BDUI extends javax.swing.JFrame
         VistasLayout.setHorizontalGroup(
             VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(VistasLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
                     .addGroup(VistasLayout.createSequentialGroup()
+                        .addGap(40, 40, 40)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(botonVerFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(VistasLayout.createSequentialGroup()
+                                .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(botonAgregarAtributo)
+                                    .addComponent(botonQuitarAtributo))
+                                .addGap(18, 18, 18)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(botonMostrarTuplas, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(20, 20, 20))
+                    .addGroup(VistasLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(comboBoxBasedatos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(comboBoxTablas, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(VistasLayout.createSequentialGroup()
+                                .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addGroup(VistasLayout.createSequentialGroup()
+                                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel7)
+                                            .addComponent(jLabel8))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(comboBoxTablas, 0, 207, Short.MAX_VALUE)
+                                            .addComponent(comboBoxBasedatos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(botonMostrarAtributos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(botonMostrarTablas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, VistasLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(botonCrearArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botonCancelarVistas, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(VistasLayout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(botonMostrarTablas)
-                            .addComponent(botonMostrarAtributos)))
-                    .addComponent(jLabel10)
-                    .addGroup(VistasLayout.createSequentialGroup()
-                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(botonAceptar)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(27, 27, 27)
-                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(botonAgregarAtributo)
-                            .addComponent(botonQuitarAtributo))
-                        .addGap(22, 22, 22)
-                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(botonAgregarFiltro))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(VistasLayout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                .addContainerGap())
         );
         VistasLayout.setVerticalGroup(
             VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -245,29 +304,140 @@ public class BDUI extends javax.swing.JFrame
                         .addComponent(botonAgregarAtributo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(botonQuitarAtributo)))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(botonVerFiltros)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(botonMostrarTuplas)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(botonAceptar)
-                    .addComponent(botonAgregarFiltro))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, VistasLayout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(53, 53, 53))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, VistasLayout.createSequentialGroup()
+                        .addGroup(VistasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(botonCancelarVistas)
+                            .addComponent(botonCrearArchivo))
+                        .addContainerGap())))
         );
+
+        jLabel11.setText("Seleccione Campo:");
+
+        jLabel12.setText("Operador:");
+
+        comboBoxOperador.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "=", "<", ">", "<=", ">=", "<>" }));
+
+        jLabel13.setText("Ingrese Valor:");
+
+        botonAgregarFiltro.setText("Agregar");
+        botonAgregarFiltro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonAgregarFiltroActionPerformed(evt);
+            }
+        });
+
+        tablaFiltros.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane4.setViewportView(tablaFiltros);
+
+        jLabel14.setText("Filtros:");
+        jLabel14.setToolTipText("");
+
+        botonAceptarFiltro.setText("Aceptar");
+        botonAceptarFiltro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonAceptarFiltroActionPerformed(evt);
+            }
+        });
+
+        botonCancelarFiltro.setText("Cancelar");
+        botonCancelarFiltro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonCancelarFiltroActionPerformed(evt);
+            }
+        });
+
+        botonEliminarFiltro.setText("Eliminar");
+        botonEliminarFiltro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonEliminarFiltroActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout FiltrosLayout = new javax.swing.GroupLayout(Filtros.getContentPane());
         Filtros.getContentPane().setLayout(FiltrosLayout);
         FiltrosLayout.setHorizontalGroup(
             FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(FiltrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(FiltrosLayout.createSequentialGroup()
+                        .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(botonAceptarFiltro))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(FiltrosLayout.createSequentialGroup()
+                                .addComponent(botonCancelarFiltro)
+                                .addGap(9, 9, 9))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, FiltrosLayout.createSequentialGroup()
+                                .addComponent(botonEliminarFiltro)
+                                .addContainerGap())))
+                    .addGroup(FiltrosLayout.createSequentialGroup()
+                        .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(FiltrosLayout.createSequentialGroup()
+                                .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel12)
+                                    .addComponent(jLabel13))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(comboBoxCampos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(comboBoxOperador, 0, 207, Short.MAX_VALUE)
+                                    .addComponent(textFieldValor))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(botonAgregarFiltro))
+                            .addComponent(jLabel14))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         FiltrosLayout.setVerticalGroup(
             FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(FiltrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(comboBoxCampos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(comboBoxOperador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(textFieldValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonAgregarFiltro))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel14)
+                .addGap(18, 18, 18)
+                .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(FiltrosLayout.createSequentialGroup()
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(FiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(botonAceptarFiltro)
+                            .addComponent(botonCancelarFiltro)))
+                    .addComponent(botonEliminarFiltro))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("Ingrese la información para conectar a Postgresql.");
 
@@ -295,8 +465,6 @@ public class BDUI extends javax.swing.JFrame
                 botonIngresarActionPerformed(evt);
             }
         });
-
-        textFieldPassword.setText("admin");
 
         botonCancelar.setText("Cancelar");
         botonCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -389,7 +557,7 @@ public class BDUI extends javax.swing.JFrame
     }//GEN-LAST:event_botonIngresarActionPerformed
 
     private void botonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelarActionPerformed
-        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_botonCancelarActionPerformed
 
     private void botonMostrarTablasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonMostrarTablasActionPerformed
@@ -404,6 +572,7 @@ public class BDUI extends javax.swing.JFrame
         {
             Lista1.clear();
             Lista2.clear();
+            comboBoxCampos.removeAllItems();
             listaAtributos1.updateUI();
             listaAtributos2.updateUI();
             ModeloTabla = new DefaultTableModel();
@@ -417,15 +586,12 @@ public class BDUI extends javax.swing.JFrame
         //primero verificamos que la lista no este vacia para poder agregar un atributo a la otra lista
         if(!Lista1.isEmpty())
         {
-            int[] listaIndices1 = listaAtributos1.getSelectedIndices();
-            for(int i = 0; i < listaIndices1.length; i++)
-            {
-                //System.out.println("Se va a mover el atributo: " + Lista1.getElementAt(listaIndices1[i]));
-                Lista2.addElement(Lista1.getElementAt(listaIndices1[i]));
-                Lista1.removeElementAt(listaIndices1[i]);
-                listaAtributos1.updateUI();
-                listaAtributos2.updateUI();
-            }
+            //System.out.println("Se va a mover el atributo: " + Lista1.getElementAt(listaIndices1[i]));
+            Lista2.addElement(Lista1.getElementAt(listaAtributos1.getSelectedIndex()));                                                
+            Lista1.removeElementAt(listaAtributos1.getSelectedIndex());                                                                
+
+            listaAtributos1.updateUI();
+            listaAtributos2.updateUI();
         }
     }//GEN-LAST:event_botonAgregarAtributoActionPerformed
 
@@ -433,27 +599,120 @@ public class BDUI extends javax.swing.JFrame
         //primero validamos que la lista este poblada antes de quitar un atributo
         if(!Lista2.isEmpty())
         {
-            int[] listaIndices2 = listaAtributos2.getSelectedIndices();
-            for(int i = 0; i < listaIndices2.length; i++)
-            {
-                Lista1.addElement(Lista2.getElementAt(listaIndices2[i]));
-                Lista2.removeElementAt(listaIndices2[i]);
-                listaAtributos1.updateUI();
-                listaAtributos2.updateUI();
-            }
+            Lista1.addElement(Lista2.getElementAt(listaAtributos2.getSelectedIndex()));
+            Lista2.removeElementAt(listaAtributos2.getSelectedIndex());
+            listaAtributos1.updateUI();
+            listaAtributos2.updateUI();
         }
     }//GEN-LAST:event_botonQuitarAtributoActionPerformed
 
-    private void botonAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAceptarActionPerformed
+    private void botonMostrarTuplasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonMostrarTuplasActionPerformed
         if(!Lista2.isEmpty())
         {
             mostrarTuplas();
         }
-    }//GEN-LAST:event_botonAceptarActionPerformed
+    }//GEN-LAST:event_botonMostrarTuplasActionPerformed
+
+    private void botonVerFiltrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVerFiltrosActionPerformed
+        comboBoxCampos.removeAllItems();
+        for(int i=0; i<Lista2.getSize(); i++){
+            comboBoxCampos.addItem(Lista2.getElementAt(i));
+        }
+        Filtros.setVisible(true);
+    }//GEN-LAST:event_botonVerFiltrosActionPerformed
 
     private void botonAgregarFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAgregarFiltroActionPerformed
-        Filtros.setVisible(true);
+        // TODO add your handling code here:
+        String campo = comboBoxCampos.getSelectedItem().toString();        
+        String tipo = getTipoDato(campo);        
+        String operador = comboBoxOperador.getSelectedItem().toString();
+        String valor = textFieldValor.getText();
+        
+        boolean flag_repetido = false;
+        boolean flag_error = false;
+        
+        //Se verifica si ya existe un filtro con campo seleccionado
+        for(int i=0; i<ModeloFiltro.getRowCount(); i++){
+            if(ModeloFiltro.getValueAt(i, 0).equals(campo)){
+               flag_repetido = true; 
+            }
+        }
+        
+        //Comparacion de tipo de datos
+        if(operador.equals("=") || operador.equals("<>")){
+            if(tipo.contains("char") || tipo.equals("text") || tipo.contains("time") || tipo.contains("date")){
+                valor = "'" + valor + "'";
+            }
+        }else{
+            if(tipo.contains("char") || tipo.equals("text")){
+                textFieldValor.setText("");
+                flag_error = true;
+                JOptionPane.showMessageDialog(this.Filtros, "El operador "+operador+" no puede ser asignado al tipo de dato "+tipo,"",JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+        if(!flag_repetido){
+            if(!flag_error){
+                String[] filtro = {tipo,campo,operador,valor};
+                agregarFiltro(filtro);
+            }
+        }else{
+            JOptionPane.showMessageDialog(this.Filtros, "El filtro seleccionado ya existe","",JOptionPane.INFORMATION_MESSAGE);
+        }
     }//GEN-LAST:event_botonAgregarFiltroActionPerformed
+
+    private void botonCancelarFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelarFiltroActionPerformed
+        // TODO add your handling code here:
+        Filtros.setVisible(false);
+    }//GEN-LAST:event_botonCancelarFiltroActionPerformed
+
+    private void botonEliminarFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonEliminarFiltroActionPerformed
+        // TODO add your handling code here:
+        try{
+            ModeloFiltro.removeRow(tablaFiltros.getSelectedRow());
+        }catch(Exception e){}
+    }//GEN-LAST:event_botonEliminarFiltroActionPerformed
+
+    private void botonAceptarFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAceptarFiltroActionPerformed
+        // TODO add your handling code here:        
+        consulta = "SELECT ";
+        //Campos
+        for(int i=0; i<Lista2.getSize(); i++){
+            if(i==0){
+                consulta += Lista2.getElementAt(i).toString();
+            }else{
+                consulta += ", "+Lista2.getElementAt(i).toString();
+            }
+        }
+        //Filtros
+        consulta += " FROM " + TablaActual;
+        for(int i=0; i<ModeloFiltro.getRowCount(); i++){
+            if(i==0){
+                consulta += " WHERE ";
+                
+            }else{
+                consulta += " AND ";
+            }
+            consulta += ModeloFiltro.getValueAt(i, 1).toString();
+            consulta += ModeloFiltro.getValueAt(i, 2).toString();
+            consulta += ModeloFiltro.getValueAt(i, 3).toString();
+        }        
+        mostrarTuplas();
+        Filtros.setVisible(false);
+    }//GEN-LAST:event_botonAceptarFiltroActionPerformed
+
+    private void botonCrearArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCrearArchivoActionPerformed
+        if(ModeloTabla.getRowCount() > 0)
+        {
+            generarArchivo();
+        }
+    }//GEN-LAST:event_botonCrearArchivoActionPerformed
+
+    private void botonCancelarVistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelarVistasActionPerformed
+        // TODO add your handling code here:       
+        Vistas.setVisible(false);
+        this.setVisible(true);
+    }//GEN-LAST:event_botonCancelarVistasActionPerformed
 
     /**
      * @param args the command line arguments
@@ -493,18 +752,30 @@ public class BDUI extends javax.swing.JFrame
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFrame Filtros;
     private javax.swing.JFrame Vistas;
-    private javax.swing.JButton botonAceptar;
+    private javax.swing.JButton botonAceptarFiltro;
     private javax.swing.JButton botonAgregarAtributo;
     private javax.swing.JButton botonAgregarFiltro;
     private javax.swing.JButton botonCancelar;
+    private javax.swing.JButton botonCancelarFiltro;
+    private javax.swing.JButton botonCancelarVistas;
+    private javax.swing.JButton botonCrearArchivo;
+    private javax.swing.JButton botonEliminarFiltro;
     private javax.swing.JButton botonIngresar;
     private javax.swing.JButton botonMostrarAtributos;
     private javax.swing.JButton botonMostrarTablas;
+    private javax.swing.JButton botonMostrarTuplas;
     private javax.swing.JButton botonQuitarAtributo;
+    private javax.swing.JButton botonVerFiltros;
     private javax.swing.JComboBox comboBoxBasedatos;
+    private javax.swing.JComboBox comboBoxCampos;
+    private javax.swing.JComboBox comboBoxOperador;
     private javax.swing.JComboBox comboBoxTablas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -516,14 +787,17 @@ public class BDUI extends javax.swing.JFrame
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JList listaAtributos1;
     private javax.swing.JList listaAtributos2;
     private javax.swing.JTable tablaDatos;
+    private javax.swing.JTable tablaFiltros;
     private javax.swing.JTextField textFieldBasedatos;
     private javax.swing.JTextField textFieldHostname;
     private javax.swing.JPasswordField textFieldPassword;
     private javax.swing.JTextField textFieldPuerto;
     private javax.swing.JTextField textFieldUsuario;
+    private javax.swing.JTextField textFieldValor;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -552,7 +826,7 @@ public class BDUI extends javax.swing.JFrame
      */
     private void mostrarVistas()
     {
-        Vistas.setVisible(true);
+        Vistas.setVisible(true);        
         try
         {
             Statement query = connection.createStatement();
@@ -592,6 +866,7 @@ public class BDUI extends javax.swing.JFrame
     
     /*
      * Procedimiento para poblar la primera lista de atributos 'listaAtributos1' con los atributos de la tabla seleccionada
+     * Se obtiene el tipo de dato para realizar filtros.
      * Usamos la conexión creado con la BD, del proc. mostrarTablas()
      * Llenamos un DefaultListModel 'Lista1' el cual desupués asignamos al JList
      */
@@ -603,11 +878,13 @@ public class BDUI extends javax.swing.JFrame
             {
                 Statement query = connection.createStatement();
                 TablaActual = comboBoxTablas.getSelectedItem().toString();
-                ResultSet rs = query.executeQuery("SELECT column_name FROM information_schema.columns WHERE table_name = '" + TablaActual + "';");
-                Lista1.clear();
+                ResultSet rs = query.executeQuery("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '" + TablaActual + "';");
+                Lista1.clear();                             
                 while(rs.next())
                 {
-                    Lista1.addElement(rs.getObject(1));
+                    Lista1.addElement(rs.getObject(1));                    
+                    Campo campo = new Campo(rs.getObject(1).toString(), rs.getObject(2).toString());                    
+                    listaCampos.add(campo);                    
                 }
             }
             catch(Exception e){System.err.println("error en MostrarAtributos");}
@@ -619,24 +896,28 @@ public class BDUI extends javax.swing.JFrame
      * Primero hacemos el query a la BD y con el ResultSet poblamos dicha tabla
      */
     private void mostrarTuplas()
-    {
+    {   
+        ModeloTabla = new DefaultTableModel();
+        tablaDatos.setModel(ModeloTabla);
+        tablaDatos.updateUI();
         try
-        {
+        {            
             Statement query = connection.createStatement();
-            String cadenaQuery = "SELECT ";
-            for(int i = 0; i < Lista2.getSize(); i++)
-            {
-                if(i > 0)
-                {
-                    cadenaQuery += ", " + Lista2.getElementAt(i);
+            String cadenaQuery = "";
+            if (ModeloFiltro.getRowCount() == 0) {
+                cadenaQuery = "SELECT ";
+                for (int i = 0; i < Lista2.getSize(); i++) {
+                    if (i > 0) {
+                        cadenaQuery += ", " + Lista2.getElementAt(i);
+                    } else {
+                        cadenaQuery += Lista2.getElementAt(i);
+                    }
                 }
-                else
-                {
-                    cadenaQuery += Lista2.getElementAt(i);
-                }
+                cadenaQuery += " FROM " + TablaActual + ";";
+                //System.out.println("Query: " + cadenaQuery);
+            }else{
+                cadenaQuery = consulta;
             }
-            cadenaQuery += " FROM " + TablaActual + ";";
-            //System.out.println("Query: " + cadenaQuery);
             ResultSet rs = query.executeQuery(cadenaQuery);
             
             ResultSetMetaData meta = rs.getMetaData();
@@ -657,6 +938,66 @@ public class BDUI extends javax.swing.JFrame
             }
             tablaDatos.setModel(ModeloTabla);
         }
-        catch(Exception e){System.err.println("error en mostrarTuplas");}
+        catch(Exception e){
+            System.err.println("error en mostrarTuplas");
+            JOptionPane.showMessageDialog(this.Vistas, "Error en la consulta, verifique los valores de filtro","",JOptionPane.ERROR_MESSAGE);
+        }
+    }        
+    
+    /*
+     * Metodo para obtener el tipo de dato del campo indicado. Se utiliza para
+     * realizar filtros de campos.
+     */
+    private String getTipoDato(String nombreCampo){
+        for(int i=0; i<listaCampos.size(); i++){
+            Campo campo = listaCampos.get(i);
+            if(campo.getNombre().equals(nombreCampo)){
+                return campo.getTipoDato();
+            }            
+        }
+        return null;
+    }
+    
+    private void agregarFiltro(String[] filtro){
+        ModeloFiltro.addRow(filtro);
+    }
+    
+    private void generarArchivo()
+    {
+        try
+        {
+            //creamos el String que imprimiremos en el archivo
+            int cols = ModeloTabla.getColumnCount();
+            int filas = ModeloTabla.getRowCount();
+            String contenido = "";
+            //recorrido para el nombre de las columnas
+            for(int i = 0; i < cols; i++)
+            {
+                contenido += ModeloTabla.getColumnName(i) + "\t";
+            }
+            contenido += "\n";
+            //recorrido para los datos de la tabla
+            for(int contF = 0; contF < filas; contF++)
+            {
+                for(int contC = 0; contC < cols; contC++)
+                {
+                    contenido += ModeloTabla.getValueAt(contF, contC) + "\t";
+                }
+                contenido += "\n";
+            }
+            
+            JFileChooser jfc = new JFileChooser();
+            int returnVal = jfc.showSaveDialog(Vistas);
+            if(returnVal == JFileChooser.APPROVE_OPTION)
+            {
+                File archivo = jfc.getSelectedFile();
+                
+                FileWriter fw = new FileWriter(archivo.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(contenido);
+                bw.close();
+            }
+        }
+        catch(Exception e){}
     }
 }
