@@ -61,7 +61,7 @@ public class SpreadSheet extends JFrame implements ActionListener{
         Object[] data =  new Object[99];
         for(int row = 0; row < 10; row++) { 
             for(int column = 0; column < 5; column++) { 
-               data[column] = column+" , "+row; 
+               data[column] = ""; 
             } 
             dtm.addRow(data); 
         }
