@@ -19,6 +19,7 @@ public class AnalysisData {
     private id3 _id3 = new id3();
     public String HTMLTree;
     private String NameFile;
+    public String LogicalCodeDecision;
     
     public boolean LoadFile(String pFile, int pAtributeClass) {
         boolean _successfull = true;
@@ -28,6 +29,8 @@ public class AnalysisData {
             _id3.readData(pFile);
             _id3.atributoClase = pAtributeClass;
             _id3.createDecisionTree();
+            getLogicalCodeDecision(_id3.root, "");
+            LogicalCodeDecision = LogicalCodeDecision.substring(4);
             htmlTree = printHTMLTree(_id3.root, "", "                ");
             writeHTMLTree(htmlTree);
         } catch (Exception ex) { _successfull = false; }
@@ -81,9 +84,9 @@ public class AnalysisData {
     private void writeHTMLTree(String htmlTree) {
         String htmlTemplate = "";
         URL url = getClass().getResource("TreeTemplate.html");
-        File file = new File("test.html");
+        File file = new File("Result.html");
 
-        try (BufferedReader br = new BufferedReader(new FileReader(url.getPath()))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(url.getPath().replace("%20", " ")))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 htmlTemplate += sCurrentLine;
@@ -113,5 +116,39 @@ public class AnalysisData {
             System.out.println(e.getMessage());
         }
         HTMLTree = html;
+    }
+    
+    private void getLogicalCodeDecision(TreeNode node, String tab) {
+        int outputattr = _id3.atributoClase;
+
+        if (node.children == null) {
+            int[] values = _id3.getAllValues(node.data, outputattr);
+            if (values.length == 1) {
+                LogicalCodeDecision += tab + "\t" + _id3.attributeNames[outputattr] + " = \"" + _id3.domains[outputattr].elementAt(values[0]) + "\";\n" ;
+                return;
+            }
+            LogicalCodeDecision += tab + "\t" + _id3.attributeNames[outputattr] + " = {\n";
+            for (int i = 0; i < values.length; i++) {
+                LogicalCodeDecision += "\"" + _id3.domains[outputattr].elementAt(values[i]) + "\" \n";
+                if (i != values.length - 1) {
+                    LogicalCodeDecision += " , \n";
+                }
+            }
+            LogicalCodeDecision += " };\n";
+            return;
+        }
+
+        int numvalues = node.children.length;
+        for (int i = 0; i < numvalues; i++) {
+            LogicalCodeDecision += tab + "if( " + _id3.attributeNames[node.decompositionAttribute] + " == \""
+                    + _id3.domains[node.decompositionAttribute].elementAt(i) + "\") {\n";
+            getLogicalCodeDecision(node.children[i], tab + "\t");
+            if (i != numvalues - 1) {
+                LogicalCodeDecision += tab + "} else \n";
+            } else {
+                LogicalCodeDecision += tab + "}\n";
+            }
+        }
+        return;
     }
 }

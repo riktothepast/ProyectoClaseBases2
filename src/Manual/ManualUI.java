@@ -16,8 +16,12 @@ limitations under the License.
 
 package Manual;
 
+import Analysis.AnalysisData;
+import Analysis.ID3UI;
 import Analysis.id3;
 import BD.BDUI;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +33,9 @@ import javax.swing.JOptionPane;
  * @author bryan
  */
 public class ManualUI extends javax.swing.JFrame {
-id3 me;
+//id3 me;
+    Analysis.AnalysisData _analisisData = new AnalysisData();
+    String PathExplorer = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
     /**
      * Creates new form ManualUI
      */
@@ -55,6 +61,7 @@ id3 me;
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -91,6 +98,11 @@ id3 me;
         jMenuBar1.add(jMenu3);
 
         jMenu2.setText("Analisis");
+        jMenu2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu2ActionPerformed(evt);
+            }
+        });
 
         jMenuItem3.setText("Analizar Archivo");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
@@ -101,7 +113,20 @@ id3 me;
         jMenu2.add(jMenuItem3);
 
         jMenuItem4.setText("Mostrar Arbol");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem4);
+
+        jMenuItem6.setText("Seleccionar Navegador Preferente");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem6);
 
         jMenuBar1.add(jMenu2);
 
@@ -150,7 +175,7 @@ id3 me;
              path = chooser.getSelectedFile().getAbsolutePath();
              System.out.println("Path: "+path+" name: "+chooser.getSelectedFile().getName());
              // call here the analisis
-              me = new id3();
+              //me = new id3();
               Scanner in = new Scanner(path);
 
               String str = in.nextLine();
@@ -160,18 +185,22 @@ id3 me;
                 "enter col name",
               JOptionPane.QUESTION_MESSAGE);
               
-              me.atributoClase = Integer.parseInt(response);
+              //me.atributoClase = Integer.parseInt(response);
 
-              int status;
+              //int status;
+              boolean status = false;
               try {
-                  status = me.readData(str);
-                  if (status <= 0) {
+                  status = _analisisData.LoadFile(str, Integer.parseInt(response));
+                  ID3UI _id3UI = new ID3UI(_analisisData.LogicalCodeDecision);
+                  _id3UI.setVisible(true);
+                  //status = me.readData(str);
+                  if (!status) {
                     return;
                  }
               } catch (Exception ex) {
                   Logger.getLogger(SpreadSheet.class.getName()).log(Level.SEVERE, null, ex);
               }
-                me.createDecisionTree();
+                //me.createDecisionTree();
           }
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
@@ -180,6 +209,30 @@ id3 me;
         BDUI uibd = new BDUI();
         uibd.setVisible(true);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        try {
+            Runtime.getRuntime().exec(PathExplorer + " " + "Result.html");
+        } catch (IOException ex) {
+            Logger.getLogger(ManualUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
+        
+        
+    }//GEN-LAST:event_jMenu2ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int returnVal = chooser.showOpenDialog(this);
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            PathExplorer = chooser.getSelectedFile().getAbsolutePath();
+            System.out.println("Path: "+chooser.getSelectedFile().getAbsolutePath());
+        }
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -226,5 +279,6 @@ id3 me;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     // End of variables declaration//GEN-END:variables
 }
